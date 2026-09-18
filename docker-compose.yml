@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]
+    volumes: ["mongo-data:/data/db"]
+
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+
+  backend:
+    build: ./backend
+    ports: ["5000:5000"]
+    env_file: ./backend/.env
+    depends_on: [mongo, redis]
+
+  worker:
+    build: ./backend
+    command: node workers/scanWorker.js
+    env_file: ./backend/.env
+    depends_on: [mongo, redis]
+
+volumes:
+  mongo-data:
