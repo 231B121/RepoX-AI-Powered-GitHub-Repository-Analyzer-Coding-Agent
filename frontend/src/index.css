@@ -1,111 +1,159 @@
+/* RepoX Design System - Soft Dimmed Off-White Theme with Desert Sun & Teal Ambient Wash */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --bg-page: #f8fafc;         /* Soft dimmed off-white / pearl slate canvas (not blinding pure white) */
+  --bg-surface: #ffffff;      /* Clean elevated surface */
+  --bg-subtle: #f1f5f9;       /* Subtle header / hover layer (slate-100) */
+  --bg-card: #ffffff;         /* Pure white cards with crisp borders */
+  --bg-card-hover: #f8fafc;   /* Card hover state */
+  --bg-terminal: #0f172a;     /* Retain dark terminal for logs/code */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --border-subtle: rgba(226, 232, 240, 0.9);  /* Slate-200 */
+  --border-card: rgba(203, 213, 225, 0.75);   /* Slate-300 */
+  --border-hover: rgba(245, 158, 11, 0.65);   /* Warm Desert Sun hover accent */
+  --border-focus: #0d9488;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --text-primary: #0f172a;    /* Crisp, high-contrast slate-900 */
+  --text-secondary: #475569;  /* Balanced slate-600 */
+  --text-muted: #64748b;      /* Slate-500 */
+  --text-light: #94a3b8;      /* Slate-400 */
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --brand-primary: #0d9488;   /* Oceanic Teal */
+  --brand-primary-hover: #0f766e;
+  --brand-gradient: linear-gradient(135deg, #0d9488 0%, #0284c7 45%, #ea580c 100%);
+  --brand-glow: rgba(13, 148, 136, 0.2);
+
+  --critical-bg: #fef2f2;
+  --critical-text: #dc2626;
+  --critical-border: #fecaca;
+
+  --high-bg: #fff7ed;
+  --high-text: #ea580c;
+  --high-border: #fed7aa;
+
+  --medium-bg: #fffbeb;
+  --medium-text: #d97706;
+  --medium-border: #fde68a;
+
+  --low-bg: #f0f9ff;
+  --low-text: #0284c7;
+  --low-border: #bae6fd;
+
+  --info-bg: #f0fdfa;
+  --info-text: #0d9488;
+  --info-border: #99f6e4;
+
+  --success-bg: #f0fdf4;
+  --success-text: #059669;
+  --success-border: #bbf7d0;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+  --shadow-brand: 0 4px 18px rgba(13, 148, 136, 0.25);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  background-image: 
+    /* Layer 1: Subtle light slate micro-dot grid */
+    radial-gradient(rgba(100, 116, 139, 0.12) 1.2px, transparent 1.2px),
+    /* Layer 2: Color 1 - Soft Warm Desert Sun Amber Glow (Top Right) */
+    radial-gradient(ellipse 950px 650px at 88% 8%, rgba(245, 158, 11, 0.14) 0%, rgba(251, 146, 60, 0.07) 45%, transparent 75%),
+    /* Layer 3: Color 2 - Fresh Oceanic Teal Blue Glow (Top Left / Mid) */
+    radial-gradient(ellipse 1000px 700px at 12% 16%, rgba(13, 148, 136, 0.14) 0%, rgba(56, 189, 248, 0.08) 50%, transparent 75%),
+    /* Layer 4: Color 1 - Warm Desert Sun Horizon Accent (Center Right) */
+    radial-gradient(ellipse 850px 550px at 80% 65%, rgba(217, 119, 6, 0.09) 0%, transparent 68%),
+    /* Layer 5: Color 2 - Oceanic Teal Blue Calm Depth (Bottom Left) */
+    radial-gradient(ellipse 900px 600px at 18% 82%, rgba(20, 184, 166, 0.10) 0%, transparent 70%),
+    /* Base Foundation: Soft Dimmed Off-White / Pearl Gradient (Not Flat White) */
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+  background-size: 26px 26px, auto, auto, auto, auto, auto;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
   border-radius: 4px;
-  color: var(--text-h);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Typography Helpers */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Spin animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Radar pulse animation */
+@keyframes radar-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(79, 70, 229, 0);
+  }
+}
+
+.animate-radar-glow {
+  animation: radar-glow 2s infinite ease-out;
 }
