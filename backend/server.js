@@ -1,16 +1,37 @@
-require("dotenv").config();
+require("dotenv").config({ override: true });
 const express = require("express");
 const cors = require("cors");
 const { connectDB, getDBStatus } = require("./config/db");
+const repositoryRoutes = require("./routes/repositoryRoutes");
+const scanRoutes = require("./routes/scanRoutes");
+const issueRoutes = require("./routes/issueRoutes");
+const fixRoutes = require("./routes/fixRoutes");
+const requestLogger = require("./middleware/requestLogger");
 
-const app = express();
+const app = express();   // 👈 pehle app banao
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET"],
+    origin: (origin, callback) => {
+      if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
+
+app.use(express.json());
+app.use(requestLogger);
+
+// 👇 ab saari routes yahan, app ke ban jaane ke baad
+app.use("/api/repositories", repositoryRoutes);
+app.use("/api", scanRoutes);
+app.use("/api/issues", issueRoutes);
+app.use("/api/fix", fixRoutes);
+app.use("/api/fixes", fixRoutes);   // 👈 ye line yahan aayi
 
 app.get("/health", (req, res) => {
   res.json({
