@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import GithubIcon from "./GithubIcon";
+import { API_BASE_URL } from "../config";
 
 export default function Navbar() {
   const [backendStatus, setBackendStatus] = useState("checking"); // 'online' | 'offline' | 'checking'
@@ -8,7 +9,7 @@ export default function Navbar() {
   useEffect(() => {
     async function checkHealth() {
       try {
-        const res = await fetch("http://localhost:5000/health");
+        const res = await fetch(`${API_BASE_URL}/health`);
         if (res.ok) {
           const data = await res.json();
           if (data.database === "connected") {
