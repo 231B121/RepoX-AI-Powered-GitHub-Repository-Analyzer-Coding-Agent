@@ -6,23 +6,40 @@ const repositoryRoutes = require("./routes/repositoryRoutes");
 const scanRoutes = require("./routes/scanRoutes");
 const issueRoutes = require("./routes/issueRoutes");
 const fixRoutes = require("./routes/fixRoutes");
+const scanQueue = require("./queue/scanQueue");
 
-const app = express();   // 👈 pehle app banao
+const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+      if (/\.vercel\.app$/.test(origin)) return callback(null, true);
+      if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) return callback(null, true);
+      return callback(null, true);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
   })
 );
 
 app.use(express.json());
 
-// 👇 ab saari routes yahan, app ke ban jaane ke baad
+// Embedded scan worker for single-service deployments (e.g. Render Web Service)
+if (process.env.SEPARATE_WORKER !== "true") {
+  const { runFullScan } = require("./jobs/runFullScan");
+  scanQueue.process(async (job) => {
+    console.log(`[Worker] Processing scan ${job.data.scanId}`);
+    await runFullScan(job.data.scanId);
+  });
+  console.log("Embedded scan worker registered on Bull queue");
+}
+
 app.use("/api/repositories", repositoryRoutes);
 app.use("/api", scanRoutes);
 app.use("/api/issues", issueRoutes);
-app.use("/api/fixes", fixRoutes);   // 👈 ye line yahan aayi
+app.use("/api/fixes", fixRoutes);
 
 app.get("/health", (req, res) => {
   res.json({
