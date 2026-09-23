@@ -17,6 +17,8 @@ function App() {
   // Scan State
   const [scanId, setScanId] = useState(null);
   const [scan, setScan] = useState(null);
+  const [loadingScan, setLoadingScan] = useState(false);
+
 
   // AI Reasoning & Explanation State
   const [explainingIssueId, setExplainingIssueId] = useState(null);
@@ -75,23 +77,40 @@ function App() {
 
   // Trigger Diagnostic Scan
   async function handleStartScan() {
-    if (!result?.repositoryId) return;
+    if (!result?.repositoryId || loadingScan) return;
     setError(null);
+    setLoadingScan(true);
 
     try {
       const res = await fetch(
         `${API_BASE_URL}/api/repositories/${result.repositoryId}/scans`,
         { method: "POST" }
       );
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server returned HTTP ${res.status}. Scan could not be initialized.`);
+      }
 
       if (!res.ok) {
-        setError(data.error?.message || "Could not start scan");
+        setError(data?.error?.message || "Could not start scan");
         return;
       }
+
       setScanId(data.scanId);
-    } catch {
-      setError("Could not reach backend to start scan");
+      // Pre-seed scan status so dashboard appears immediately with radar animation
+      setScan({
+        scan: {
+          _id: data.scanId,
+          status: data.status || "PENDING",
+        },
+        issues: [],
+      });
+    } catch (err) {
+      setError(err.message || "Could not reach backend to start scan");
+    } finally {
+      setLoadingScan(false);
     }
   }
 
@@ -101,23 +120,36 @@ function App() {
       return;
     }
 
-    const interval = setInterval(async () => {
+    let isSubscribed = true;
+
+    async function pollScanStatus() {
       try {
         const res = await fetch(`${API_BASE_URL}/api/scans/${scanId}`);
         const data = await res.json();
 
+        if (!isSubscribed) return;
+
         if (!res.ok) {
-          setError(data.error?.message || "Could not fetch scan status");
+          setError(data?.error?.message || "Could not fetch scan status");
           return;
         }
         setScan(data);
       } catch {
-        setError("Could not reach backend while polling scan status");
+        if (isSubscribed) {
+          setError("Could not reach backend while polling scan status");
+        }
       }
-    }, 2000);
+    }
 
-    return () => clearInterval(interval);
-  }, [scanId, scan]);
+    // Trigger immediate check then poll every 2s
+    pollScanStatus();
+    const interval = setInterval(pollScanStatus, 2000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
+  }, [scanId, scan?.scan?.status]);
 
   // Request AI Explanation for an Issue
   async function handleExplain(issueId) {
@@ -268,6 +300,7 @@ function App() {
           handleStartScan={handleStartScan}
           scanId={scanId}
           scanStatus={scan?.scan?.status}
+          loadingScan={loadingScan}
         />
       )}
 

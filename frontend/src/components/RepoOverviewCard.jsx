@@ -5,6 +5,7 @@ export default function RepoOverviewCard({
   handleStartScan,
   scanId,
   scanStatus,
+  loadingScan,
 }) {
   if (!result) return null;
 
@@ -119,9 +120,14 @@ export default function RepoOverviewCard({
         <button
           className="btn-scan"
           onClick={handleStartScan}
-          disabled={scanId !== null}
+          disabled={scanId !== null || loadingScan}
         >
-          {isScanning ? (
+          {loadingScan ? (
+            <>
+              <Sparkles size={17} className="animate-spin" />
+              <span>Initiating Scan...</span>
+            </>
+          ) : isScanning ? (
             <>
               <Sparkles size={17} className="animate-spin" />
               <span>Scanning In Progress...</span>

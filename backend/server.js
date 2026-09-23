@@ -28,13 +28,22 @@ app.use(express.json());
 
 // Embedded scan worker for single-service deployments (e.g. Render Web Service)
 if (process.env.SEPARATE_WORKER !== "true") {
-  const { runFullScan } = require("./jobs/runFullScan");
-  scanQueue.process(async (job) => {
-    console.log(`[Worker] Processing scan ${job.data.scanId}`);
-    await runFullScan(job.data.scanId);
-  });
-  console.log("Embedded scan worker registered on Bull queue");
+  if (scanQueue) {
+    const { runFullScan } = require("./jobs/runFullScan");
+    try {
+      scanQueue.process(async (job) => {
+        console.log(`[Worker] Processing scan ${job.data.scanId}`);
+        await runFullScan(job.data.scanId);
+      });
+      console.log("Embedded scan worker registered on Bull queue");
+    } catch (workerErr) {
+      console.warn("Could not register embedded worker on Bull queue:", workerErr.message);
+    }
+  } else {
+    console.log("Bull queue inactive (no external Redis). Direct asynchronous scanner active.");
+  }
 }
+
 
 app.use("/api/repositories", repositoryRoutes);
 app.use("/api", scanRoutes);
