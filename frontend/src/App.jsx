@@ -5,6 +5,7 @@ import RepoInputSection from "./components/RepoInputSection";
 import RepoOverviewCard from "./components/RepoOverviewCard";
 import ScanDashboard from "./components/ScanDashboard";
 import IssuesExplorer from "./components/IssuesExplorer";
+import { API_BASE_URL } from "./config";
 
 function App() {
   // Repository Ingest State
@@ -52,7 +53,7 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/repositories/ingest", {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/ingest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: url.trim() }),
@@ -66,7 +67,7 @@ function App() {
         setResult(data);
       }
     } catch {
-      setError("Could not connect to backend server at http://localhost:5000");
+      setError(`Could not connect to backend server at ${API_BASE_URL}`);
     } finally {
       setLoading(false);
     }
@@ -79,7 +80,7 @@ function App() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/repositories/${result.repositoryId}/scans`,
+        `${API_BASE_URL}/api/repositories/${result.repositoryId}/scans`,
         { method: "POST" }
       );
       const data = await res.json();
@@ -102,7 +103,7 @@ function App() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/scans/${scanId}`);
+        const res = await fetch(`${API_BASE_URL}/api/scans/${scanId}`);
         const data = await res.json();
 
         if (!res.ok) {
@@ -124,7 +125,7 @@ function App() {
     setError(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/issues/${issueId}/analyze`, {
+      const res = await fetch(`${API_BASE_URL}/api/issues/${issueId}/analyze`, {
         method: "POST",
       });
       const data = await res.json();
@@ -157,7 +158,7 @@ function App() {
     setError(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/issues/${issueId}/fix`, {
+      const res = await fetch(`${API_BASE_URL}/api/issues/${issueId}/fix`, {
         method: "POST",
       });
       const data = await res.json();
@@ -187,7 +188,7 @@ function App() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/fixes/${agentRunId}/validate`,
+        `${API_BASE_URL}/api/fixes/${agentRunId}/validate`,
         { method: "POST" }
       );
       const data = await res.json();
@@ -217,7 +218,7 @@ function App() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/fixes/${agentRunId}/pr`,
+        `${API_BASE_URL}/api/fixes/${agentRunId}/pr`,
         { method: "POST" }
       );
       const data = await res.json();
