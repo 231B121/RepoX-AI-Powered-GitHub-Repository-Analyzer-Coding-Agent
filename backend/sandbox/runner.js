@@ -1,10 +1,17 @@
-const Docker = require("dockerode");
 const fs = require("fs/promises");
 const os = require("os");
 const path = require("path");
 const { execSync } = require("child_process");
 
-const docker = new Docker();
+let Docker = null;
+let docker = null;
+try {
+  Docker = require("dockerode");
+  docker = new Docker();
+} catch (err) {
+  console.warn(`[Sandbox] Docker/Dockerode unavailable (${err.message}). Safe host fallback will be used.`);
+}
+
 const TIMEOUT_MS = 60_000;
 
 /**
@@ -41,6 +48,10 @@ async function prepareWorkdir(owner, repo, branchOrCommit, filePath, newContent)
  * Runs containerized sandbox validation on the patched repo using node:20-slim.
  */
 async function runInSandbox(workdir, targetFilePath = "") {
+  if (!docker) {
+    console.warn("Docker sandbox unavailable (dockerode not initialized). Running local runtime validation fallback.");
+    return runLocalValidation(workdir, targetFilePath);
+  }
   let container = null;
   try {
     const ext = path.extname(targetFilePath).toLowerCase();
