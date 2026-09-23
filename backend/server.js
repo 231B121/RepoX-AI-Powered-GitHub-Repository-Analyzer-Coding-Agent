@@ -1,4 +1,12 @@
 require("dotenv").config();
+
+process.on("unhandledRejection", (reason) => {
+  console.warn("[Process Warning] Unhandled Rejection:", reason?.message || reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[Process Error] Uncaught Exception:", err?.message || err);
+});
+
 const express = require("express");
 const cors = require("cors");
 const { connectDB, getDBStatus } = require("./config/db");
@@ -7,6 +15,7 @@ const scanRoutes = require("./routes/scanRoutes");
 const issueRoutes = require("./routes/issueRoutes");
 const fixRoutes = require("./routes/fixRoutes");
 const scanQueue = require("./queue/scanQueue");
+
 
 const app = express();
 

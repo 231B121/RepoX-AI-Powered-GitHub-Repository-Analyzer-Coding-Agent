@@ -2,12 +2,20 @@ const Queue = require("bull");
 
 let scanQueue = null;
 
-const redisUrlRaw = process.env.REDIS_URL ? process.env.REDIS_URL.trim() : "";
-const isProduction = process.env.NODE_ENV === "production" || process.env.RENDER === "true";
+const redisUrlRaw = (process.env.REDIS_URL || "").trim();
 
-// In production (Render etc.), only initialize Bull if an external REDIS_URL is provided (not 127.0.0.1)
+// Strictly check if REDIS_URL points to a local loopback address
+const isLoopback =
+  redisUrlRaw.includes("127.0.0.1") ||
+  redisUrlRaw.includes("localhost") ||
+  redisUrlRaw.includes("::1") ||
+  redisUrlRaw.includes("0.0.0.0");
+
+// Only attempt Redis connection if:
+// 1) An explicit remote URL is provided (e.g. Upstash, AWS, Render Redis, etc.)
+// 2) Or USE_LOCAL_REDIS=true is explicitly set for local dev testing
 const shouldInitializeRedis = Boolean(
-  redisUrlRaw && (!isProduction || (!redisUrlRaw.includes("127.0.0.1") && !redisUrlRaw.includes("localhost")))
+  redisUrlRaw && (!isLoopback || process.env.USE_LOCAL_REDIS === "true")
 );
 
 if (shouldInitializeRedis) {
@@ -32,15 +40,15 @@ if (shouldInitializeRedis) {
     });
 
     scanQueue.on("error", (err) => {
-      console.warn("[Bull Queue Warning]:", err.message);
+      console.warn("[Bull Queue Warning]:", err?.message || err);
     });
   } catch (err) {
-    console.warn("[Bull Queue] Initialization error:", err.message);
+    console.warn("[Bull Queue] Initialization error:", err?.message || err);
     scanQueue = null;
   }
 } else {
   console.log(
-    "[Queue] No external REDIS_URL detected. Direct background execution will be used for scans."
+    "[Queue] No remote REDIS_URL detected. Direct in-process asynchronous scanner is active."
   );
 }
 
