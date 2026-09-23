@@ -9,7 +9,7 @@ const EXPECTED_SECTIONS = [
 
 async function analyzeDocumentation(owner, repo, defaultBranch, filePaths, repositoryId) {
   const issues = [];
-  const readmePath = filePaths.find((p) => /^readme\.md$/i.test(p) || /\/readme\.md$/i.test(p));
+  const readmePath = filePaths.find((p) => /^readme\.md$/i.test(p));
 
   if (!readmePath) {
     issues.push({
@@ -17,43 +17,30 @@ async function analyzeDocumentation(owner, repo, defaultBranch, filePaths, repos
       category: "DOCUMENTATION",
       severity: "MEDIUM",
       title: "No README found",
-      description: "Repository does not contain a README.md documentation file at the root.",
-      evidence: "No file matching README.md found in repository tree",
-      recommendation: "Add a README.md describing the project purpose, architecture, installation, and usage.",
+      description: "Repository does not contain a README.md at the root.",
+      evidence: "No file matching README.md found in file tree",
+      recommendation: "Add a README describing the project, installation, and usage.",
       confidence: 0.95,
     });
     return issues;
   }
 
-  let content = "";
-  try {
-    content = await getFileContent(owner, repo, readmePath, defaultBranch);
-  } catch {
-    return issues;
-  }
+  const content = await getFileContent(owner, repo, readmePath, defaultBranch);
 
-  const missingSections = [];
   for (const section of EXPECTED_SECTIONS) {
     if (!section.pattern.test(content)) {
-      missingSections.push(section);
+      issues.push({
+        repositoryId,
+        category: "DOCUMENTATION",
+        severity: "LOW",
+        title: `README missing: ${section.label}`,
+        description: `No content matching "${section.label}" was detected in the README.`,
+        filePath: readmePath,
+        evidence: `Pattern /${section.pattern.source}/ not found in README content`,
+        recommendation: `Consider adding a section covering ${section.label.toLowerCase()}.`,
+        confidence: 0.5,
+      });
     }
-  }
-
-  if (missingSections.length > 0) {
-    const missingLabels = missingSections.map((s) => s.label);
-    const missingPatterns = missingSections.map((s) => `/${s.pattern.source}/i`).join(", ");
-
-    issues.push({
-      repositoryId,
-      category: "DOCUMENTATION",
-      severity: missingSections.length >= 3 ? "MEDIUM" : "LOW",
-      title: `README incomplete: Missing ${missingLabels.length} standard section${missingLabels.length > 1 ? "s" : ""}`,
-      description: `${readmePath} is missing standard documentation: ${missingLabels.join(", ")}.`,
-      filePath: readmePath,
-      evidence: `Missing patterns in ${readmePath}: ${missingPatterns}`,
-      recommendation: `Update ${readmePath} by adding dedicated sections for: ${missingLabels.join(", ")}.`,
-      confidence: 0.9,
-    });
   }
 
   return issues;
