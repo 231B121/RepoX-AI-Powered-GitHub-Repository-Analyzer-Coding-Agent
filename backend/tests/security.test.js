@@ -43,7 +43,8 @@ const config = {
   });
 
   test("detects generic API key pattern with 0.4 confidence", async () => {
-    const mockContent = `const api_key = "abcde12345fghij67890";`;
+    // Use a placeholder that matches the pattern but is clearly not a real secret
+    const mockContent = `const api_key = "PLACEHOLDER_KEY_FOR_TESTING";`;
     getFileContent.mockResolvedValue(mockContent);
 
     const issues = await analyzeSecurity(
