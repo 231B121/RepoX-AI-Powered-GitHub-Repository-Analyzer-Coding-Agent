@@ -78,17 +78,17 @@ describe("dependencies analyzer", () => {
       expect(getFileContent).toHaveBeenCalledWith("testowner", "testrepo", "package.json", "main");
       expect(issues).toHaveLength(2);
 
-      const expressIssue = issues.find((i) => i.title.includes("express"));
+      const expressIssue = issues.find((i) => i.description.includes("express") || i.evidence.includes("express"));
       expect(expressIssue).toBeDefined();
       expect(expressIssue.severity).toBe("MEDIUM");
       expect(expressIssue.category).toBe("DEPENDENCY");
-      expect(expressIssue.description).toContain("resolves to 4.18.2, latest published is 5.0.0");
+      expect(expressIssue.description).toContain("express (4.18.2 → 5.0.0)");
       expect(expressIssue.repositoryId).toBe("repo-123");
 
-      const nodemonIssue = issues.find((i) => i.title.includes("nodemon"));
+      const nodemonIssue = issues.find((i) => i.description.includes("nodemon") || i.evidence.includes("nodemon"));
       expect(nodemonIssue).toBeDefined();
       expect(nodemonIssue.severity).toBe("LOW");
-      expect(nodemonIssue.description).toContain("resolves to 3.0.0, latest published is 3.1.4");
+      expect(nodemonIssue.description).toContain("nodemon (3.0.0 → 3.1.4)");
     });
 
     test("returns empty array when all dependencies are up-to-date", async () => {

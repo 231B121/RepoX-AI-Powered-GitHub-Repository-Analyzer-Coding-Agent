@@ -32,10 +32,21 @@ const STANDARD_GLOBALS = {
   URL: "readonly",
   URLSearchParams: "readonly",
   AbortController: "readonly",
+  AbortSignal: "readonly",
   FormData: "readonly",
   Headers: "readonly",
   Request: "readonly",
   Response: "readonly",
+  // Jest & testing environment globals
+  describe: "readonly",
+  test: "readonly",
+  it: "readonly",
+  expect: "readonly",
+  beforeEach: "readonly",
+  afterEach: "readonly",
+  beforeAll: "readonly",
+  afterAll: "readonly",
+  jest: "readonly",
 };
 
 async function analyzeCodeQuality(owner, repo, defaultBranch, filePaths, repositoryId) {

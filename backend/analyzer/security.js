@@ -102,10 +102,11 @@ async function analyzeSecurity(owner, repo, defaultBranch, filePaths, repository
     });
   }
 
-  // Filter candidate source and configuration files
+  // Filter candidate source and configuration files (exclude tests and test fixtures to prevent false positives on mock tokens)
   const candidateFiles = filePaths
     .filter((p) => /\.(js|mjs|cjs|jsx|ts|tsx|json|env|yaml|yml|py)$/i.test(p))
     .filter((p) => !p.includes("node_modules") && !p.includes("dist") && !p.includes("package-lock.json"))
+    .filter((p) => !/(^|\/)(\.test\.|\.spec\.|tests?\/|__tests__\/|fixtures\/|mocks?\/)/i.test(p))
     .slice(0, 50);
 
   for (const filePath of candidateFiles) {

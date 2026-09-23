@@ -40,20 +40,22 @@ function analyzeTests(filePaths, repositoryId) {
       recommendation: "Introduce a test suite, starting with the most critical modules.",
       confidence: 0.9,
     });
-  } else {
-    for (const path of importantUntested.slice(0, 20)) {
-      issues.push({
-        repositoryId,
-        category: "TESTING",
-        severity: "MEDIUM",
-        title: `No test file found for ${path}`,
-        description: `No corresponding test file was found for this module by naming convention.`,
-        filePath: path,
-        evidence: `No file named ${baseName(path)}.test.js or ${baseName(path)}.spec.js found`,
-        recommendation: `Add tests covering the main behaviors of ${path}.`,
-        confidence: 0.6,
-      });
-    }
+  } else if (importantUntested.length > 0) {
+    const untestedNames = importantUntested.map((p) => p.split("/").pop());
+    const sampleList = untestedNames.slice(0, 5).join(", ");
+    const moreCount = untestedNames.length > 5 ? ` (+${untestedNames.length - 5} more)` : "";
+
+    issues.push({
+      repositoryId,
+      category: "TESTING",
+      severity: "LOW",
+      title: `Expand unit test coverage (${importantUntested.length} modules untested)`,
+      description: `Repository has ${testFiles.length} active test file(s), but ${importantUntested.length} modules currently lack dedicated unit tests: ${sampleList}${moreCount}.`,
+      filePath: importantUntested[0],
+      evidence: `${testFiles.length} test files indexed for ${sourceFiles.length} source files`,
+      recommendation: `Add unit tests covering main functions in ${sampleList}.`,
+      confidence: 0.75,
+    });
   }
 
   return issues;

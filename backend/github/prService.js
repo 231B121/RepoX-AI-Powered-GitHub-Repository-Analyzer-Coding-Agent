@@ -25,7 +25,7 @@ async function createFixBranch(owner, repo, defaultBranch, issueId) {
         ref: `heads/${fallbackBranch}`,
       });
       baseSha = fallbackRef.object.sha;
-    } catch (innerErr) {
+    } catch {
       throw new Error(`Could not find base branch reference in ${owner}/${repo}: ${err.message}`);
     }
   }
@@ -152,7 +152,7 @@ async function submitPullRequest({
       targetOwner = existingFork.owner.login;
       targetRepo = existingFork.name;
       forkReady = true;
-    } catch (_) {
+    } catch {
       // Fork does not exist, create it
       try {
         const { data: forkData } = await octokit.repos.createFork({ owner, repo });

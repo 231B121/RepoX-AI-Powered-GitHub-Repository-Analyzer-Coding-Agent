@@ -1,6 +1,5 @@
 const { prepareWorkdir, runInSandbox, cleanup } = require("../sandbox/runner");
 const Repository = require("../models/Repository");
-const Scan = require("../models/Scan");
 
 async function validatePatch(agentRun) {
   const repository = await Repository.findById(agentRun.repositoryId);

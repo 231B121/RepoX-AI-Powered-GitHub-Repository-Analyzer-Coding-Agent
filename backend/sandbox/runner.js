@@ -122,7 +122,7 @@ echo "[SANDBOX] ✓ Validation completed successfully with exit code 0."
       timedOut = true;
       try {
         await container.kill();
-      } catch (_) {}
+      } catch {}
     }, TIMEOUT_MS);
 
     const { StatusCode } = await container.wait();
@@ -151,7 +151,7 @@ echo "[SANDBOX] ✓ Validation completed successfully with exit code 0."
     if (container) {
       try {
         await container.remove({ force: true });
-      } catch (_) {}
+      } catch {}
     }
   }
 }
