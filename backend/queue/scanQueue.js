@@ -1,7 +1,10 @@
 const Queue = require("bull");
 
-const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";
-const isTls = redisUrl.startsWith("rediss://");
+let redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+if (redisUrl.includes("upstash.io") && redisUrl.startsWith("redis://")) {
+  redisUrl = redisUrl.replace(/^redis:\/\//, "rediss://");
+}
+const isTls = redisUrl.startsWith("rediss://") || redisUrl.includes("upstash.io");
 
 const scanQueue = new Queue("repository-scan", redisUrl, {
   redis: isTls
